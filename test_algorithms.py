@@ -18,7 +18,9 @@ from rubik_solver.Solver.Beginner import BeginnerSolver
 from rubik_solver.Solver.CFOP import CFOPSolver
 from rubik_solver.Solver.Kociemba import KociembaSolver
 
-def benchmark_algorithm(solver_class, algorithm_name, num_trials=5):
+trials = 10
+
+def benchmark_algorithm(solver_class, algorithm_name, num_trials=trials):
     """Benchmark a solving algorithm over multiple trials"""
     print(f"\nBenchmarking {algorithm_name}... ({num_trials} trials)")
     
@@ -144,7 +146,7 @@ def create_visualizations(results_list):
     # 3. Time Distribution (Box Plot)
     ax3 = plt.subplot(2, 3, 3)
     time_data = [r['times'] for r in results_list]
-    bp1 = ax3.boxplot(time_data, labels=algorithms, patch_artist=True)
+    bp1 = ax3.boxplot(time_data, tick_labels=algorithms, patch_artist=True)
     for patch, color in zip(bp1['boxes'], colors):
         patch.set_facecolor(color)
         patch.set_alpha(0.7)
@@ -155,7 +157,7 @@ def create_visualizations(results_list):
     # 4. Move Distribution (Box Plot)
     ax4 = plt.subplot(2, 3, 4)
     move_data = [r['moves'] for r in results_list]
-    bp2 = ax4.boxplot(move_data, labels=algorithms, patch_artist=True)
+    bp2 = ax4.boxplot(move_data, tick_labels=algorithms, patch_artist=True)
     for patch, color in zip(bp2['boxes'], colors):
         patch.set_facecolor(color)
         patch.set_alpha(0.7)
@@ -211,7 +213,7 @@ def main():
     print("="*80)
     print("RUBIK'S CUBE ALGORITHM BENCHMARK WITH VISUALIZATION")
     print("="*80)
-    print("\nRunning benchmarks (1000 trials per algorithm)...")
+    print("\nRunning benchmarks (" + str(trials) + " trials per algorithm)...")
     print("This will take several minutes. Please wait...")
     
     # Run benchmarks
