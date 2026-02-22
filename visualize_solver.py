@@ -405,12 +405,18 @@ def draw_cube_state_final(ax, cube_string, positions, face_indices):
     ax.set_axis_off()
     ax.view_init(elev=35, azim=-45)
 
-def update_cube_visualization(ax, cube, title, positions, face_indices):
+def update_cube_visualization(ax, cube, title, positions, face_indices, timing_text=None):
     """Update the cube visualization with new cube state."""
     naive_cube = cube.to_naive_cube()
     cube_string = naive_cube.get_cube()
     draw_cube_state_final(ax, cube_string, positions, face_indices)
-    ax.set_title(title, fontsize=16, fontweight='bold')
+    ax.set_title(title, fontsize=14, fontweight='bold')
+    
+    # Draw timing text to the left of the cube
+    if timing_text:
+        ax.text2D(-0.25, 0.5, timing_text, transform=ax.transAxes,
+                  fontsize=12, verticalalignment='center', fontfamily='monospace',
+                  bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
 def get_solver_choice():
     """Prompt user to choose which solver to use."""
@@ -500,6 +506,9 @@ def main():
     # Solve with selected solver
     print(f"Step 3: Solving with {solver_names[solver_choice]}...")
     
+    # Start the stopwatch
+    start_time = time.time()
+    
     if solver_choice == 'beginner':
         solver = BeginnerSolver(cube)
         solution_moves = solver.solution()
@@ -510,7 +519,13 @@ def main():
         solver = KociembaSolver(cube)
         solution_moves = solver.solution()
     
-    print(f"✓ Solution found: {len(solution_moves)} moves")
+    # Calculate computation time
+    compute_time = time.time() - start_time
+    compute_minutes = int(compute_time // 60)
+    compute_seconds = compute_time % 60
+    compute_time_str = f"{compute_minutes:02d}:{compute_seconds:05.2f}"
+    
+    print(f"✓ Solution found: {len(solution_moves)} moves (computed in {compute_time_str})")
     print()
     
     # Animate the solution - show each move step by step with stopwatch
@@ -518,25 +533,45 @@ def main():
     print("   (Watch the cube solve in real-time!)")
     print()
     
-    # Start the stopwatch
-    start_time = time.time()
+    # Start a new timer for the animation phase
+    animation_start_time = time.time()
     
     for i, move in enumerate(solution_moves):
         # Apply move to cube
         cube.move(move)
-        # Calculate elapsed time
-        elapsed = time.time() - start_time
-        # Format time as MM:SS.ms
-        minutes = int(elapsed // 60)
-        seconds = elapsed % 60
-        time_str = f"{minutes:02d}:{seconds:05.2f}"
-        # Update and show visualization with stopwatch
-        title = f"Solving with {solver_names[solver_choice]}... Move {i+1}/{len(solution_moves)}: {move} | Time: {time_str}"
-        update_cube_visualization(ax, cube, title, positions, face_indices)
+        # Calculate animation elapsed time
+        anim_elapsed = time.time() - animation_start_time
+        # Total elapsed time (including computation)
+        total_elapsed = compute_time + anim_elapsed
+        # Format times
+        anim_min = int(anim_elapsed // 60)
+        anim_sec = anim_elapsed % 60
+        anim_time_str = f"{anim_min:02d}:{anim_sec:05.2f}"
+        total_min = int(total_elapsed // 60)
+        total_sec = total_elapsed % 60
+        total_time_str = f"{total_min:02d}:{total_sec:05.2f}"
+        # Update and show visualization with both times
+        title = f"{solver_names[solver_choice]} ({len(solution_moves)} moves) - Move {i+1}/{len(solution_moves)}: {move}"
+        timing_text = f"Compute Time: {compute_time_str}\nMoves Time: {anim_time_str}\nTotal: {total_time_str}"
+        update_cube_visualization(ax, cube, title, positions, face_indices, timing_text)
         plt.pause(0.02)  # Pause to see each move
     
-    # Final solved state
-    update_cube_visualization(ax, cube, "Solved Cube!", positions, face_indices)
+    # Calculate final animation time
+    final_anim_time = time.time() - animation_start_time
+    final_total_time = compute_time + final_anim_time
+    
+    # Format final times
+    anim_min = int(final_anim_time // 60)
+    anim_sec = final_anim_time % 60
+    final_anim_str = f"{anim_min:02d}:{anim_sec:05.2f}"
+    total_min = int(final_total_time // 60)
+    total_sec = final_total_time % 60
+    final_total_str = f"{total_min:02d}:{total_sec:05.2f}"
+    
+    # Final solved state with times
+    final_title = f"Solved! - {solver_names[solver_choice]} ({len(solution_moves)} moves)"
+    final_timing_text = f"Compute Time: {compute_time_str}\nMoves Time: {final_anim_str}\nTotal: {final_total_str}"
+    update_cube_visualization(ax, cube, final_title, positions, face_indices, final_timing_text)
     print("✓ Solution animated!")
     print()
     
