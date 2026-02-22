@@ -412,10 +412,43 @@ def update_cube_visualization(ax, cube, title, positions, face_indices):
     draw_cube_state_final(ax, cube_string, positions, face_indices)
     ax.set_title(title, fontsize=16, fontweight='bold')
 
+def get_solver_choice():
+    """Prompt user to choose which solver to use."""
+    print("=" * 70)
+    print("CHOOSE YOUR SOLVER")
+    print("=" * 70)
+    print()
+    print("Available solvers:")
+    print("  1. Beginner   - Good for learning, step-by-step approach")
+    print("  2. CFOP       - Speedcubing method, popular and efficient")
+    print("  3. Kociemba   - Most efficient, computer-optimized solution")
+    print()
+    
+    while True:
+        choice = input("Enter your choice (1-3): ").strip()
+        if choice == '1':
+            return 'beginner'
+        elif choice == '2':
+            return 'cfop'
+        elif choice == '3':
+            return 'kociemba'
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
 def main():
     print("=" * 70)
     print("RUBIK'S CUBE: SOLVE AND VISUALIZE")
     print("=" * 70)
+    print()
+    
+    # Get solver choice from user
+    solver_choice = get_solver_choice()
+    solver_names = {
+        'beginner': "Beginner's algorithm",
+        'cfop': 'CFOP method',
+        'kociemba': 'Kociemba algorithm'
+    }
+    print(f"You selected: {solver_names[solver_choice]}")
     print()
     
     # Create and scramble a cube
@@ -464,10 +497,19 @@ def main():
     print("✓ Scrambled cube displayed")
     print()
     
-    # Solve with Beginner solver
-    print("Step 3: Solving with Beginner's algorithm...")
-    solver = BeginnerSolver(cube)
-    solution_moves = solver.solution()
+    # Solve with selected solver
+    print(f"Step 3: Solving with {solver_names[solver_choice]}...")
+    
+    if solver_choice == 'beginner':
+        solver = BeginnerSolver(cube)
+        solution_moves = solver.solution()
+    elif solver_choice == 'cfop':
+        solver = CFOPSolver(cube)
+        solution_moves = solver.solution()
+    elif solver_choice == 'kociemba':
+        solver = KociembaSolver(cube)
+        solution_moves = solver.solution()
+    
     print(f"✓ Solution found: {len(solution_moves)} moves")
     print()
     
@@ -489,9 +531,9 @@ def main():
         seconds = elapsed % 60
         time_str = f"{minutes:02d}:{seconds:05.2f}"
         # Update and show visualization with stopwatch
-        title = f"Solving... Move {i+1}/{len(solution_moves)}: {move} | Time: {time_str}"
+        title = f"Solving with {solver_names[solver_choice]}... Move {i+1}/{len(solution_moves)}: {move} | Time: {time_str}"
         update_cube_visualization(ax, cube, title, positions, face_indices)
-        plt.pause(0.4)  # Pause to see each move
+        plt.pause(0.1)  # Pause to see each move
     
     # Final solved state
     update_cube_visualization(ax, cube, "Solved Cube!", positions, face_indices)
@@ -501,7 +543,7 @@ def main():
     print("=" * 70)
     print("SUCCESS!")
     print(f"The cube was scrambled with {len(scramble_moves)} moves")
-    print(f"and solved in {len(solution_moves)} moves using Beginner's algorithm!")
+    print(f"and solved in {len(solution_moves)} moves using {solver_names[solver_choice]}!")
     print()
     print("Interact with the 3D visualization:")
     print("  • Click and drag to rotate the view")
