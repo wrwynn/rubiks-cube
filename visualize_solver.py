@@ -533,7 +533,7 @@ def main():
         # Update and show visualization with stopwatch
         title = f"Solving with {solver_names[solver_choice]}... Move {i+1}/{len(solution_moves)}: {move} | Time: {time_str}"
         update_cube_visualization(ax, cube, title, positions, face_indices)
-        plt.pause(0.1)  # Pause to see each move
+        plt.pause(0.02)  # Pause to see each move
     
     # Final solved state
     update_cube_visualization(ax, cube, "Solved Cube!", positions, face_indices)
