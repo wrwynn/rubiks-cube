@@ -18,7 +18,7 @@ from rubik_solver.Solver.Beginner import BeginnerSolver
 from rubik_solver.Solver.CFOP import CFOPSolver
 from rubik_solver.Solver.Kociemba import KociembaSolver
 
-trials = 10
+trials = 5
 
 def benchmark_algorithm(solver_class, algorithm_name, num_trials=trials):
     """Benchmark a solving algorithm over multiple trials"""
